@@ -1,5 +1,4 @@
 """
-align_room_10x10_final.py
 
 逻辑确认：
  1. Z轴向上 (Up)。
@@ -392,6 +391,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
