@@ -28,7 +28,7 @@ scene/cameras.py
 submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
 ```
 
-在修改[3DGS渲染代码](./render.py)使其只渲染虚拟视角，由于生成的图像相机内参是与真实图像一致的，所以所覆盖的视野我们是不确定的，所以需要更改```python create_virtual_camera.py```渲染n*n的图像来保证能够覆盖到所有的范围，n这个值一般设为10
+在修改[3DGS渲染代码](./render.py)使其只渲染虚拟视角，由于生成的图像相机内参是与真实图像一致的，所以所覆盖的视野我们是不确定的，所以需要更改```create_virtual_camera.py```渲染n*n的图像来保证能够覆盖到所有的范围，n这个值一般设为10
 
 ## 修复图像
 
