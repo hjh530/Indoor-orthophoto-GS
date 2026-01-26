@@ -41,3 +41,5 @@ submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
 <div align="center">
   <img src="./assets/virtual2.png" />
 </div>
+
+## 图像拼接
