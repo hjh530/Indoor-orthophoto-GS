@@ -2,5 +2,5 @@
 
 ## 由colmap开源软件生成稀疏点云和相机位姿
 <div align="center">
-  <img src="./assets/colmap.png" width="300" />
+  <img src="./assets/colmap.png" />
 </div>
