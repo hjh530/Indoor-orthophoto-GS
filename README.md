@@ -35,9 +35,9 @@ submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
 这里使用的是[DIFIX3D](https://github.com/nv-tlabs/Difix3D)官方修复，采用无参考视图的方法修复的，因为渲染的视角是从上往下的正射投影，而图像采集视角一般是人平视或者仰视拍摄，所以渲染出来的图像会有伪影，此时采取修复的方法来修复伪影，从而获得干净的视角。
 
 <div align="center">
-  <img src="./assets/.png" />
+  <img src="./assets/virtual1.png" />
 </div>
 
 <div align="center">
-  <img src="./assets/colmap2.png" />
+  <img src="./assets/virtual2.png" />
 </div>
