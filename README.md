@@ -20,10 +20,12 @@
 这部分与[3DGS](https://github.com/graphdeco-inria/gaussian-splatting)训练逻辑一致，但是加入的虚拟视角是不需要参与训练的，所以对[3DGS训练代码](./train.py)进行修改，这个demo主要是根据另外一个项目写的，这个项目同样适用，可以忽略添加的其他一些参数。只需要将这个train.py替换掉3DGS中的train.py即可。
 
 ## 渲染3DGS
-由于3DGS训练与渲染采取的是透视投影，所以需要重新创建一个虚拟环境，这个新的虚拟环境中只做渲染不做训练，我们仅仅需要更改一下投影关系即可，具体来说更改
+由于3DGS训练与渲染采取的是透视投影，所以需要重新创建一个虚拟环境，这个新的虚拟环境中只做渲染不做训练，我们仅仅需要更改一下投影关系即可，具体来说更改下面的文件，我已经上传我更改后的文件，修改cuda后需要重新编译一下，或者在安装虚拟环境前更改文件，然后按照3DGS官方流程在装虚拟环境。
 ```python
 utils/graphics_utils.py
 gaussian_renderer/__init__.py
 scene/cameras.py
 submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
 ```
+
+在修改[3DGS渲染代码](./render.py)使其只渲染虚拟视角，由于生成的图像相机内参是与真实图像一致的，所以所覆盖的视野我们是不确定的，所以需要更改```python create_virtual_camera.py```渲染n*n的图像来保证能够覆盖到所有的范围，n这个值一般设为10
