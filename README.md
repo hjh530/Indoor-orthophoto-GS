@@ -17,4 +17,9 @@
 代码位于[生成占位图像](./create_dummy_images.py)，为了顺利进入3DGS训练，需要生成虚拟视角的占位图，这些图像不需要参与训练，只需要渲染即可。
 
 ## 训练3DGS
-这部分与[3DGS](https://github.com/graphdeco-inria/gaussian-splatting)训练逻辑一致，但是加入的虚拟视角是不需要参与训练的，所以对[3DGS训练代码](./train.py)进行修改，这个demo主要是根据另外一个项目写的，这个项目同样适用，可以忽略添加的其他一些参数。
+这部分与[3DGS](https://github.com/graphdeco-inria/gaussian-splatting)训练逻辑一致，但是加入的虚拟视角是不需要参与训练的，所以对[3DGS训练代码](./train.py)进行修改，这个demo主要是根据另外一个项目写的，这个项目同样适用，可以忽略添加的其他一些参数。只需要将这个train.py替换掉3DGS中的train.py即可。
+
+## 渲染3DGS
+由于3DGS训练与渲染采取的是透视投影，所以需要重新创建一个虚拟环境，这个新的虚拟环境中只做渲染不做训练，我们仅仅需要更改一下投影关系即可，具体来说更改
+```python
+utils/graphics_utils.py
