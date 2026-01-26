@@ -12,5 +12,9 @@
 <div align="center">
   <img src="./assets/colmap2.png" />
 </div>
+
 ## 准备3DGS训练数据
 代码位于[生成占位图像](./create_dummy_images.py)，为了顺利进入3DGS训练，需要生成虚拟视角的占位图，这些图像不需要参与训练，只需要渲染即可。
+
+## 训练3DGS
+这部分与[[3DGS]([链接地址](https://github.com/graphdeco-inria/gaussian-splatting))](https://github.com/graphdeco-inria/gaussian-splatting)
