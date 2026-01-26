@@ -23,3 +23,7 @@
 由于3DGS训练与渲染采取的是透视投影，所以需要重新创建一个虚拟环境，这个新的虚拟环境中只做渲染不做训练，我们仅仅需要更改一下投影关系即可，具体来说更改
 ```python
 utils/graphics_utils.py
+gaussian_renderer/__init__.py
+scene/cameras.py
+submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
+```
