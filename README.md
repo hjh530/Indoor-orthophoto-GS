@@ -28,7 +28,7 @@ scene/cameras.py
 submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
 ```
 
-在修改[3DGS渲染代码](./render.py)使其只渲染虚拟视角，由于生成的图像相机内参是与真实图像一致的，所以所覆盖的视野我们是不确定的，所以需要更改```create_virtual_camera.py```渲染n*n的图像来保证能够覆盖到所有的范围，n这个值一般设为10
+在修改[3DGS渲染代码](./render.py)使其只渲染虚拟视角，由于生成的图像相机内参是与真实图像一致的，所以所覆盖的视野我们是不确定的，所以需要更改```create_virtual_camera.py```渲染n*n的图像来保证能够覆盖到所有的范围，n这个值一般设为5
 
 ## 修复图像
 
@@ -44,5 +44,9 @@ submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
 
 ## 图像拼接
 
+由于生成的位姿是网格状的，因为大多数的建筑房间均为矩形，所以设置5*5的网格可以包含整个区域，重叠度很高，亮度差异很小，所以用python自带的stitch_images库，sift计算特征点，然后特征匹配计算单应矩阵，拼接即可，由于视野差距，拼接后边缘多余的部分可以手动裁剪掉，这里我尝试过四点法找房间的四个角点，然后透视变换生成，但是效果变差了，所以手动裁剪。
 
+<div align="center">  
+<img src="./assets/virtual2.png" />
+</div>
 
