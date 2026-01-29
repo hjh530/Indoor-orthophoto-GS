@@ -1,52 +1,77 @@
-# 本项目是针对室内3DGS生成正射影像的教程和重要的一些代码
+# 基于3D Gaussian Splatting的室内正射影像生成
 
-## 由colmap开源软件生成稀疏点云和相机位姿
+本教程详细介绍了从多视角图像生成室内正射影像的完整流程，涵盖从稀疏重建、坐标系对齐、模型训练到最终图像拼接与修复的各个环节。
 
-数据输入格式参照3DGS格式，导出为.txt格式
-<div align="center">
-  <img src="./assets/colmap.png" />
-</div>
+## 1. 稀疏点云与相机位姿生成
 
-## 坐标系转化
-代码位于[坐标系转化生成虚拟视角](./create_virtual_camera.py)，主要是利用ransack算法估计地面平面，将世界坐标系的z轴转化到地面平面上，方向朝上，然后通过XY 轴曼哈顿对齐 (Manhattan World Alignment)，房间一般都是矩形，已知z轴即可通过降维将点全部投影到xoy平面中然后通过最小包围盒算法找到x，y轴方向，xy轴方向需要与房间的墙面平行，所以该算法适合于矩形房间。
-<div align="center">
-  <img src="./assets/colmap2.png" />
-</div>
-
-## 准备3DGS训练数据
-代码位于[生成占位图像](./create_dummy_images.py)，为了顺利进入3DGS训练，需要生成虚拟视角的占位图，这些图像不需要参与训练，只需要渲染即可。
-
-## 训练3DGS
-这部分与[3DGS](https://github.com/graphdeco-inria/gaussian-splatting)训练逻辑一致，但是加入的虚拟视角是不需要参与训练的，所以对[3DGS训练代码](./train.py)进行修改，这个demo主要是根据另外一个项目写的，这个项目同样适用，可以忽略添加的其他一些参数。只需要将这个train.py替换掉3DGS中的train.py即可。
-
-## 渲染3DGS
-由于3DGS训练与渲染采取的是透视投影，所以需要重新创建一个虚拟环境，这个新的虚拟环境中只做渲染不做训练，我们仅仅需要更改一下投影关系即可，具体来说更改下面的文件，我已经上传我更改后的文件，修改cuda后需要重新编译一下，或者在安装虚拟环境前更改文件，然后按照3DGS官方流程在装虚拟环境。
-```python
-utils/graphics_utils.py
-gaussian_renderer/__init__.py
-scene/cameras.py
-submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
-```
-
-在修改[3DGS渲染代码](./render.py)使其只渲染虚拟视角，由于生成的图像相机内参是与真实图像一致的，所以所覆盖的视野我们是不确定的，所以需要更改```create_virtual_camera.py```渲染n*n的图像来保证能够覆盖到所有的范围，n这个值一般设为5
-
-## 修复图像
-
-这里使用的是[DIFIX3D](https://github.com/nv-tlabs/Difix3D)官方修复，采用无参考视图的方法修复的，因为渲染的视角是从上往下的正射投影，而图像采集视角一般是人平视或者仰视拍摄，所以渲染出来的图像会有伪影，此时采取修复的方法来修复伪影，从而获得干净的视角。
+使用开源软件 COLMAP 从输入图像中恢复稀疏点云和相机位姿。  
+数据需组织为3DGS标准输入格式，并导出为`.txt`文件。
 
 <div align="center">
-  <img src="./assets/virtual1.png" />
+  <img src="./assets/colmap.png" alt="COLMAP稀疏重建结果示意图" />
 </div>
+
+## 2. 坐标系对齐
+
+代码位于：[坐标系转换与虚拟相机生成](./create_virtual_camera.py)
+
+- **地面估计**：通过RANSAC算法估计地面平面，将世界坐标系的Z轴对齐至地面法向（垂直向上）
+- **曼哈顿对齐**：在矩形房间假设下，将点云投影至XOY平面，通过最小包围盒确定与墙面平行的X、Y轴方向
 
 <div align="center">
-  <img src="./assets/virtual2.png" />
+  <img src="./assets/colmap2.png" alt="坐标系对齐示意图" />
 </div>
 
-## 图像拼接
+## 3. 准备3DGS训练数据
 
-由于生成的位姿是网格状的，因为大多数的建筑房间均为矩形，所以设置5*5的网格可以包含整个区域，重叠度很高，亮度差异很小，所以用python自带的stitch_images库，sift计算特征点，然后特征匹配计算单应矩阵，拼接即可，由于视野差距，拼接后边缘多余的部分可以手动裁剪掉，这里我尝试过四点法找房间的四个角点，然后透视变换生成，但是效果变差了，所以手动裁剪。对裁剪后的图像可以再次使用DIFIX3D进行修复最后得到室内的正射影像。
+代码位于：[生成占位图像](./create_dummy_images.py)
+
+为顺利进行3DGS训练，需生成一组虚拟相机视角的占位图像。这些图像不参与训练，仅用于后续渲染。
+
+## 4. 训练3DGS模型
+
+训练流程与原始[3D Gaussian Splatting](https://github.com/graphdeco-inria/gaussian-splatting)项目基本一致。  
+本项目中，虚拟相机视角不参与训练，因此对训练代码进行了适配调整。
+
+**使用方法**：将本项目提供的 [train.py](./train.py) 替换原3DGS代码中的对应文件即可。  
+（注：本Demo基于其他项目修改而来，部分额外参数可忽略）
+
+## 5. 渲染3DGS模型
+
+由于3DGS默认使用透视投影，为生成正射影像，需在新虚拟环境中单独进行渲染，并修改投影关系。
+
+**需修改的文件如下：**
+- `utils/graphics_utils.py`
+- `gaussian_renderer/__init__.py`
+- `scene/cameras.py`
+- `submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu`
+
+建议在安装环境前完成上述文件的修改，并按官方流程编译CUDA扩展。
+
+**渲染执行**：通过修改后的 [render.py](./render.py) 仅渲染虚拟视角。  
+由于虚拟相机内参与真实相机一致，视野覆盖范围不确定，建议在 `create_virtual_camera.py` 中设置网格状相机阵列（如5×5），以确保完整覆盖目标区域。
+
+## 6. 图像修复
+
+使用 [DIFIX3D](https://github.com/nv-tlabs/Difix3D) 进行无参考修复。  
+由于渲染视角（垂直向下）与采集视角（平视/仰视）差异较大，渲染结果可能出现伪影，本步骤用于消除这些伪影，获得清晰图像。
+
+<div align="center">
+  <img src="./assets/virtual1.png" alt="修复前渲染示例" />
+  <img src="./assets/virtual2.png" alt="修复后结果示例" />
+</div>
+
+## 7. 图像拼接
+
+虚拟相机按网格排列，重叠度高且光照一致，适合采用特征匹配进行拼接。
+
+- 使用Python `stitch_images` 库，基于SIFT特征匹配与单应性矩阵进行图像融合
+- 拼接后边缘可能存在冗余区域，可手动裁剪
+- （注：曾尝试通过角点检测与透视变换自动裁剪，但效果下降，故建议手动处理）
+
+对裁剪后的图像可再次使用DIFIX3D进行修复，最终得到完整的室内正射影像。
 
 <div align="center">  
-<img src="./assets/final_feature_fix.jpg" />
+  <img src="./assets/final_feature_fix.jpg" alt="最终拼接修复结果示例" />
 </div>
 
