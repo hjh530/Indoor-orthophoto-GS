@@ -47,6 +47,6 @@ submodules/diff-gaussian-rasterization/cuda_rasterizer/forward.cu
 由于生成的位姿是网格状的，因为大多数的建筑房间均为矩形，所以设置5*5的网格可以包含整个区域，重叠度很高，亮度差异很小，所以用python自带的stitch_images库，sift计算特征点，然后特征匹配计算单应矩阵，拼接即可，由于视野差距，拼接后边缘多余的部分可以手动裁剪掉，这里我尝试过四点法找房间的四个角点，然后透视变换生成，但是效果变差了，所以手动裁剪。
 
 <div align="center">  
-<img src="./assets/virtual2.png" />
+<img src="./assets/final_feature_fix.png" />
 </div>
 
